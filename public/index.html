@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cluster Management</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 80%;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .cluster {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .cluster span {
+            font-size: 18px;
+        }
+        .edit-icon {
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Cluster Server Management</h2>
+    <div id="clusters"></div>
+</div>
+
+<script>
+    function loadClusters() {
+        fetch('http://localhost:8080/clusters')
+            .then(response => response.json())
+            .then(data => {
+                let clustersHtml = '';
+                data.forEach(cluster => {
+                    clustersHtml += `
+                    <div class="cluster">
+                        <span>${cluster.name} (${cluster.server_count} servers)</span>
+                        <span class="edit-icon" onclick="editCluster(${cluster.id})">✎</span>
+                    </div>`;
+                });
+                document.getElementById('clusters').innerHTML = clustersHtml;
+            });
+    }
+
+    function editCluster(id) {
+        const newCount = prompt('Enter new server count:');
+        if (newCount) {
+            fetch(`http://localhost:8080/clusters/${id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ server_count: newCount })
+            }).then(response => {
+                if (response.ok) {
+                    loadClusters();
+                }
+            });
+        }
+    }
+
+    loadClusters();
+</script>
+
+</body>
+</html>

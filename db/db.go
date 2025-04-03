@@ -1,6 +1,8 @@
 package db
 
 import (
+	"go-cluster-portal/models"
+
 	"github.com/jinzhu/gorm"
 	_ "github.com/lib/pq"
 )
